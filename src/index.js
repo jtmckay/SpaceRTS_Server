@@ -1,2 +1,2 @@
-require('./lobbyServer')
-require('./gameServer')
+require('./lobby/server')
+require('./server')

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js | tee latest.log",
-    "serve-game": "node src/gameServer | tee latest_game.log",
-    "serve-lobby": "node src/lobbyServer | tee latest_lobby.log"
+    "serve-game": "node src/server | tee latest_game.log",
+    "serve-lobby": "node src/lobby/server | tee latest_lobby.log"
   },
   "author": "Taylor McKay",
   "license": "MIT",

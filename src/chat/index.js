@@ -7,7 +7,6 @@ module.exports = function (io) {
                 socket.join('chat_message_list_' + channel);
                 socket.join('chat_message_' + channel);
                 socket.emit('chat_message_list_' + channel, messages)
-                console.log('messages2', messages.length)
             })
         
             socket.on('chat_leave', (channel, callback) => {
@@ -20,7 +19,6 @@ module.exports = function (io) {
                     const messageToSend = { name: message.iam.name, text: message.text }
                     messages.push(messageToSend)
                     io.sockets.emit('chat_message_' + channel, messageToSend)
-                    console.log('messages1', messages.length)
                 }
                 while (messages.length > 50) {
                     messages.shift()
