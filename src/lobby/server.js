@@ -6,7 +6,7 @@ const io = require('socket.io')({
     cookie: false
 });
 
-const chatClient = require('./chatClient')
+const chatClient = require('../chat')
 
 io.listen(3060);
 

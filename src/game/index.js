@@ -25,7 +25,7 @@ const constants = {
 
 module.exports = function (io) {
     let messages = []
-    let players = [{}, {}, {}, {}, {}, {}]
+    let players = []
     const objectManager = objectManagerFactory(io)
 
     function setupGame (gameSetup) {
@@ -92,6 +92,77 @@ module.exports = function (io) {
                     return i - offset - 10
                 })
             })
+
+            const trajectories = [
+                [0, 0, 10000],
+                [0, 2000, 10000],
+                [0, 4000, 10000],
+                [0, 6000, 10000],
+                [0, 8000, 10000],
+                [0, 10000, 10000],
+                [0, 10000, 8000],
+                [0, 10000, 6000],
+                [0, 10000, 4000],
+                [0, 10000, 2000],
+                [0, 10000, 0],
+                [0, 10000, 0],
+                [2000, 10000, 0],
+                [4000, 10000, 0],
+                [6000, 10000, 0],
+                [8000, 10000, 0],
+                [10000, 10000, 0],
+                [10000, 8000, 0],
+                [10000, 6000, 0],
+                [10000, 4000, 0],
+                [10000, 2000, 0],
+                [10000, 0, 0],
+                [-0, -0, -10000],
+                [-0, -2000, -10000],
+                [-0, -4000, -10000],
+                [-0, -6000, -10000],
+                [-0, -8000, -10000],
+                [-0, -10000, -10000],
+                [-0, -10000, -8000],
+                [-0, -10000, -6000],
+                [-0, -10000, -4000],
+                [-0, -10000, -2000],
+                [-0, -10000, -0],
+                [-0, -10000, -0],
+                [-2000, -10000, -0],
+                [-4000, -10000, -0],
+                [-6000, -10000, -0],
+                [-8000, -10000, -0],
+                [-10000, -10000, -0],
+                [-10000, -8000, -0],
+                [-10000, -6000, -0],
+                [-10000, -4000, -0],
+                [-10000, -2000, -0],
+                [-10000, -0, -0]
+            ]
+
+            const shipGroup = trajectories.map(num => {
+                return objectManager.addShip({
+                    owner: player.id,
+                    type: 'phoenix',
+                    color: constants.color[index],
+                    position: constants.position[index].map((i, index) => {
+                        if (index === 0) {
+                            return i - offset - 30
+                        }
+                        if (index === 1) {
+                            return i + offset + 10
+                        }
+                        return i - offset - 10
+                    }),
+                    mass: 1000,
+                    maxVelocity: 200,
+                    engine: 100
+                })
+            })
+
+            shipGroup.forEach((ship, index) => {
+                objectManager.moveShip(ship.id, trajectories[index])
+            })
         })
     }
 
@@ -112,7 +183,7 @@ module.exports = function (io) {
 
         socket.on('game_end', (gameSetup, callback) => {
             messages = []
-            players = [{}, {}, {}, {}, {}, {}]
+            players = []
             objectManager.resetGame()
             callback(true)
         })
