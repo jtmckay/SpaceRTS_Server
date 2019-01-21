@@ -34,7 +34,7 @@ function getHeading (currentTime, ship, targetCoordinates) {
     const targetVector = getVector(targetCoordinates)
     let position
     if (ship.heading) {
-        position = getPosition(currentTime, ship.heading)
+        position = getPosition(currentTime, ship)
     } else {
         position = ship.position
     }

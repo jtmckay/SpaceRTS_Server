@@ -1,5 +1,5 @@
 const uuid = require('uuid/v4')
-const { getHeading } = require('./movement')
+const { getHeading, getPosition } = require('./movement')
 
 function objectManagerFactory (io) {
     const internal = {
@@ -69,7 +69,7 @@ function objectManagerFactory (io) {
 
     /*
         params: {
-            owner: string,
+            ownerId: string,
             type: string,
             color: Array(number),
             position: Array(number),
@@ -77,30 +77,62 @@ function objectManagerFactory (io) {
             heading: Array(number)
         }
     */
-    function addShip (params) {
+    function addShip (params, trajectory) {
         const id = uuid()
         const ship = {
             id,
             ...params
+        }
+        if (trajectory) {
+            ship.heading = getHeading(Date.now(), ship, trajectory)
         }
         internal.ships[id] = ship
         io.sockets.emit('ship_add', ship)
         return ship
     }
 
-    function moveShips (shipIds, heading) {
-        shipIds.forEach(ship => moveShip(ship, heading))
+    function moveShips (ownerId, shipIds, heading) {
+        shipIds.forEach(ship => moveShip(ownerId, ship, heading))
     }
 
-    function moveShip (shipId, targetCoordinates) {
+    function moveShip (ownerId, shipId, targetCoordinates) {
         const ship = internal.ships[shipId]
-        let startTime = Date.now()
+        if (!ship || ship.ownerId !== ownerId) {
+            console.log('Not the owner', ownerId, ship)
+            return
+        }
+        let currentTime = Date.now()
 
-        const heading = getHeading(startTime, ship, targetCoordinates)
+        const heading = getHeading(currentTime, ship, targetCoordinates)
         ship.heading = heading
+        ship.position = heading.startPosition
         io.sockets.emit('ship_movement_start', {
             id: shipId,
             heading
+        })
+    }
+
+    function stopShips (ownerId, shipIds) {
+        shipIds.forEach(shipId => stopShip(ownerId, shipId))
+    }
+
+    function stopShip (ownerId, shipId) {
+        const ship = internal.ships[shipId]
+        if (!ship || ship.ownerId !== ownerId) {
+            console.log('Not the owner', ownerId, ship)
+            return
+        }
+        if (!ship.heading) {
+            console.log('Ship is already stopped')
+            return
+        }
+        
+        let currentTime = Date.now()
+        ship.position = getPosition(currentTime, ship)
+        delete ship.heading
+        io.sockets.emit('ship_movement_stop', {
+            id: shipId,
+            position: ship.position
         })
     }
 
@@ -113,7 +145,9 @@ function objectManagerFactory (io) {
         addStation,
         addShip,
         moveShips,
-        moveShip
+        moveShip,
+        stopShip,
+        stopShips
     }
 }
 

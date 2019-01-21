@@ -40,7 +40,7 @@ module.exports = function (io) {
 
             const offset = 1500
             objectManager.addStation({
-                owner: player.id,
+                ownerId: player.id,
                 size: 10,
                 color: constants.color[index],
                 position: constants.position[index].map((i, index) => {
@@ -52,7 +52,7 @@ module.exports = function (io) {
             })
 
             objectManager.addShip({
-                owner: player.id,
+                ownerId: player.id,
                 type: 'phoenix',
                 color: constants.color[index],
                 position: constants.position[index].map((i, index) => {
@@ -64,7 +64,7 @@ module.exports = function (io) {
             })
 
             objectManager.addShip({
-                owner: player.id,
+                ownerId: player.id,
                 type: 'phoenix',
                 color: constants.color[index],
                 position: constants.position[index].map((i, index) => {
@@ -79,7 +79,7 @@ module.exports = function (io) {
             })
 
             objectManager.addShip({
-                owner: player.id,
+                ownerId: player.id,
                 type: 'phoenix',
                 color: constants.color[index],
                 position: constants.position[index].map((i, index) => {
@@ -140,9 +140,9 @@ module.exports = function (io) {
                 [-10000, -0, -0]
             ]
 
-            const shipGroup = trajectories.map(num => {
+            trajectories.forEach(trajectory => {
                 return objectManager.addShip({
-                    owner: player.id,
+                    ownerId: player.id,
                     type: 'phoenix',
                     color: constants.color[index],
                     position: constants.position[index].map((i, index) => {
@@ -157,11 +157,7 @@ module.exports = function (io) {
                     mass: 1000,
                     maxVelocity: 200,
                     engine: 100
-                })
-            })
-
-            shipGroup.forEach((ship, index) => {
-                objectManager.moveShip(ship.id, trajectories[index])
+                }, trajectory)
             })
         })
     }
@@ -189,10 +185,13 @@ module.exports = function (io) {
         })
 
         socket.on('command_units_vector_heading', ({ id, unitsToOrder, target }, callback) => {
-            if (id) {
-                objectManager.moveShips(unitsToOrder, target)
-                callback(true)
-            }
+            objectManager.moveShips(id, unitsToOrder, target)
+            callback(true)
+        })
+
+        socket.on('command_units_stop', ({ id, unitsToOrder }, callback) => {
+            objectManager.stopShips(id, unitsToOrder)
+            callback(true)
         })
     }
 
